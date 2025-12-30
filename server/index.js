@@ -1,40 +1,36 @@
-
-
 const express = require('express');
 const http = require('http');
-const {Server} =  require ('socket.io');
+const { Server } = require('socket.io');
 const cors = require('cors');
-
 
 const app = express();
 app.use(cors());
 
-const server= http.createServer(app);
+const server = http.createServer(app);
 
 const io = new Server(server, {
-    cors:{
+    cors: {
         origin: "*",
-        methods: ["GET","POST"]
+        methods: ["GET", "POST"]
     }
-})
+});
 
+io.on('connection', (socket) => {
+    console.log('Usuario conectado:', socket.id);
 
-io.on('connection', (socket) =>{
-    console.log('Usuario se conecto: ', socket.id);
-
-    socket.on('mesaje', (data)=>{
-        io.emit('mesaje',{
-            texto:data,
-            id:socket.id.slice(0,5)
-        })
-
-    })
-
-    socket.on('disconnect', () => {
-        console.log('Usuario desconectado: ', socket.id);
+    socket.on('mensaje', (data) => {
+        // Importante: lo que recibimos del cliente lo enviamos a todos
+        io.emit('mensaje', {
+            nombre: data.nombre, // Antes estaba como 'name' en tu HTML, lo unificamos a 'nombre'
+            texto: data.texto,
+            id: socket.id.slice(0, 5)
+        });
     });
 
-})
+    socket.on('disconnect', () => {
+        console.log('Usuario desconectado:', socket.id);
+    });
+});
 
 const PORT = process.env.PORT || 6969;
-server.listen(PORT, () => console.log(`Servidro en puerto ${PORT}`));
+server.listen(PORT, () => console.log(`Servidor en puerto ${PORT}`));

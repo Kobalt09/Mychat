@@ -4,34 +4,57 @@
     <title>Chat Global</title>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; height: 90vh; }
-        #mensajes { flex-grow: 1; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
+        body { font-family: sans-serif; display: flex; flex-direction: column; height: 90vh; padding: 20px; }
+        #mensajes { flex-grow: 1; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
+        .msg { margin-bottom: 8px; padding: 5px; border-radius: 4px; background: #f9f9f9; }
+        input { padding: 8px; margin-bottom: 5px; }
+        button { padding: 10px; cursor: pointer; background: #28a745; color: white; border: none; }
     </style>
 </head>
 <body>
     <h2>Mi Chat Online</h2>
     <div id="mensajes"></div>
+    
+    <input type="text" id="username" placeholder="Nombre de usuario">
     <input type="text" id="inputMensaje" placeholder="Escribe algo...">
     <button onclick="enviar()">Enviar</button>
 
     <script>
-        // DIRECCIÓN IMPORTANTE:
-        // Para probar local: "http://localhost:4000"
-        // Para internet: La URL que te de Render (ver Parte 3)
-        const socket = io("http://26.152.31.236:6969"); 
+        // Recuerda: usa "localhost" para tu PC y "la IP" para la otra computadora
+        const socket = io("http://localhost:6969"); 
 
         const mensajesDiv = document.getElementById('mensajes');
 
         socket.on('mensaje', (data) => {
-            const p = document.createElement('p');
-            p.innerHTML = `<strong>${data.id}:</strong> ${data.texto}`;
-            mensajesDiv.appendChild(p);
+            const div = document.createElement('div');
+            div.classList.add('msg');
+            
+            // CORRECCIÓN: data.nombre (debe coincidir con el servidor)
+            div.innerHTML = `<strong>${data.nombre}:</strong> ${data.texto}`;
+            
+            mensajesDiv.appendChild(div);
+            mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
         });
 
         function enviar() {
-            const input = document.getElementById('inputMensaje');
-            socket.emit('mensaje', input.value);
-            input.value = '';
+            const inputname = document.getElementById('username');
+            const inputtext = document.getElementById('inputMensaje');
+            
+            const name = inputname.value.trim() || "Anonimo";
+            const texto = inputtext.value.trim();
+            
+            // CORRECCIÓN: usamos la variable 'texto' que acabas de crear
+            if (texto !== "") {
+                socket.emit('mensaje', {
+                    nombre: name,
+                    texto: texto
+                });
+
+                // Bloqueamos el nombre para que no se cambie en cada mensaje
+                inputname.disabled = true;
+                // Limpiamos solo el cuadro del mensaje
+                inputtext.value = '';
+            }
         }
     </script>
 </body>
