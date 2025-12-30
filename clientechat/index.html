@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Global</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; height: 90vh; }
+        #mensajes { flex-grow: 1; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Mi Chat Online</h2>
+    <div id="mensajes"></div>
+    <input type="text" id="inputMensaje" placeholder="Escribe algo...">
+    <button onclick="enviar()">Enviar</button>
+
+    <script>
+        // DIRECCIÓN IMPORTANTE:
+        // Para probar local: "http://localhost:4000"
+        // Para internet: La URL que te de Render (ver Parte 3)
+        const socket = io("http://26.152.31.236:6969"); 
+
+        const mensajesDiv = document.getElementById('mensajes');
+
+        socket.on('mensaje', (data) => {
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>${data.id}:</strong> ${data.texto}`;
+            mensajesDiv.appendChild(p);
+        });
+
+        function enviar() {
+            const input = document.getElementById('inputMensaje');
+            socket.emit('mensaje', input.value);
+            input.value = '';
+        }
+    </script>
+</body>
+</html>
