@@ -39,5 +39,5 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = process.env.PORT || 6969;
+const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => console.log(`Servidor en puerto ${PORT}`));
